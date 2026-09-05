@@ -1,10 +1,11 @@
-import type { Product } from "../types";
+// TEMPORÁRIO — SUBSTITUIR PELA QUERY REAL (ver lib/vender/queries.ts)
+import { Product } from '../types';
 
-export const products: Product[] = [
-  { id: "1", name: "Cafe torrado", category: "Mercearia", price: 18.9, stock: 12 },
-  { id: "2", name: "Leite integral", category: "Frios", price: 6.49, stock: 8 },
-  { id: "3", name: "Pao de forma", category: "Padaria", price: 9.9, stock: 0 },
-  { id: "4", name: "Arroz branco", category: "Mercearia", price: 27.5, stock: 20 },
-  { id: "5", name: "Queijo mussarela", category: "Frios", price: 14.75, stock: 5 },
-  { id: "6", name: "Suco de laranja", category: "Bebidas", price: 8.25, stock: 15 },
+export const mockProducts: Product[] = [
+  { id: '1', name: 'Camiseta Polo', categorySlug: 'roupas', variantLabel: 'Têxtil • Azul Marinho', price: 8000, stock: 12, imageUrl: 'https://lh3.googleusercontent.com/aida-public/AB6AXuDHEMiHv9ZfOs6rnIKCCvgfPqIIXWSgxpe70OEr2LawdfrKXIMF2DtBfjCHvBRdOx-Ycy98by2x7rL6CmZVyIyN_SMmM4kJehMMuMLQwxK5xVajITc-Mp9Zr8iYfJ4eijSXP0Hf6uqEH5rIpBob8DzBQb7HObxb7oLSwff7DPtmcJyIvddOh-oLzNd2_QUUfJRogjvGxMkPuMFykSGz_9hGM1ceNiSKPXEO-ZS-Ci2CQRmNmjZWQTVa', imageAlt: 'Camiseta polo azul marinho' },
+  { id: '2', name: 'Ténis Running Sport', categorySlug: 'calcados', variantLabel: 'Calçados • Tam. 42', price: 24500, stock: 5, imageUrl: 'https://lh3.googleusercontent.com/aida-public/AB6AXuD0un1oyq66lrQ3FRg3qtd3a-mHkMhpWrwP6SpMwIR_XCfgppFFEtCmqZwPkjUvrOpDpqCmU9A3PMY04jEEUCp3MGw6v1YP8O559uXBjdWbu5H_Z6nfvDYAaAphXT2PehVKhVhi4OSfkBjoCtj5obf1XssH9uGuWRi9NCWGGlT2I9aU6eqtD9hmrQSFeXfQ76WDH5rhvg121B9BdneuVG8aADslpArMv65g4q4x4unI2Ly_HJtye5gw', imageAlt: 'Ténis de corrida' },
+  { id: '3', name: 'Calça Jeans Slim', categorySlug: 'roupas', variantLabel: 'Jeans • Tam. 38/40', price: 15000, stock: 8, imageUrl: 'https://lh3.googleusercontent.com/aida-public/AB6AXuAAqVWUktzgnqSNDwQk22DY4jl0AUWDGKtMiyQVcPlF6VhHJOlr-G2OiJnXbwj6kVgcsrKn2bH2gHF033KZ9cYB8eSj9Kws6_cyIlXH_Uhl7bxlKtzvIgnQLcGcJ7XEwlqmhekExhwfFhuMakTIMQUEazHI0ns-78P03_HHB9RBVc1V4R5hgpI1n1PheQHQFedVt618r1YuL2STnRSk4AKCZ2CSRx9BO9Jl87FpahIKYGYHbZDO4oBE', imageAlt: 'Calça jeans slim' },
+  { id: '4', name: 'Vestido Floral Elegance', categorySlug: 'roupas', variantLabel: 'Vestuário • Tam. M', price: 18000, stock: 4, imageUrl: 'https://lh3.googleusercontent.com/aida-public/AB6AXuCSWr34tEh_23KtQtlj7dLvIy-N4rOfurd31hngUNS_uhCckcQzRf4gf8Dwvdgd8Riwn52B1Qwv5-T2dyRtVuZFlhFD8Acx182sHID5QsqCtAjM1G9Pu7hP8zUO81pFe8vHOQGUhYmwq86do8T_h_wWt2AKw4EVoMhSqxa5_SYSQmthLrT6z9SxYgWADGn3P1bXTRozNoi6L4FrsMiw2PnduYzGnFGhPGUZrcIt-S8qFjCTyX4WrscC', imageAlt: 'Vestido floral' },
+  { id: '5', name: 'Água Mineral 500ml', categorySlug: 'bebidas', variantLabel: 'Bebida • Sem gás', price: 350, stock: 45, imageUrl: '', imageAlt: 'Água mineral 500ml' },
+  { id: '6', name: 'Auriculares Bluetooth Pro', categorySlug: 'eletronicos', variantLabel: 'Eletrônicos • Noise Cancelling', price: 12000, stock: 2, imageUrl: 'https://lh3.googleusercontent.com/aida-public/AB6AXuCPPisWFqEUlomin6wPBACLiLRFfQl7zDgP11uf8wacWirGAInqy6w7oGkCKvANY-N6AFop437gplmH0FAzK9KhKLhkuhxTrIXF-oWKWdKn39ND6XS-8Msw7s63m_fBie_rdaDTZYZ6xNPFUxaamPKd_VbSz2Dvq_jJak7bu3R1FtRvbr1_HjkD_B70XhK4-prQ8eQCTeK4PkU_VeYZIu-LC3v4bOTdhB0uoeJ_MflSSwWOSn5RLLAN', imageAlt: 'Auriculares bluetooth' },
 ];

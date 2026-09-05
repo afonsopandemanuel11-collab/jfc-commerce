@@ -1,9 +1,14 @@
-import type { Product } from "./types";
+import { StockStatus } from './types';
 
-export function isProductAvailable(product: Product) {
-  return product.stock > 0;
+export function getStockStatus(stock: number): StockStatus {
+  if (stock <= 2) return 'critico';
+  if (stock <= 4) return 'baixo';
+  return 'disponivel';
 }
 
-export function getAvailableQuantity(product: Product, quantity: number) {
-  return Math.min(Math.max(quantity, 0), product.stock);
+export function getStockLabel(stock: number): string {
+  const status = getStockStatus(stock);
+  if (status === 'critico') return `${stock} disp. (Crítico)`;
+  if (status === 'baixo') return `${stock} disp. (Baixo)`;
+  return `${stock} disp.`;
 }

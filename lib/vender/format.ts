@@ -1,3 +1,3 @@
-export function formatCurrency(value: number) {
-  return value.toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
+export function formatKz(value: number): string {
+  return `Kz ${value.toLocaleString('pt-PT')}`;
 }

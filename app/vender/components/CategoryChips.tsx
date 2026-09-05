@@ -1,23 +1,37 @@
-type CategoryChipsProps = {
-  categories: string[];
-  selected: string;
-  onSelect: (category: string) => void;
-};
+'use client';
 
-export function CategoryChips({ categories, selected, onSelect }: CategoryChipsProps) {
+import { CATEGORIES } from '@/lib/vender/categories';
+
+interface CategoryChipsProps {
+  active: string;
+  onSelect: (slug: string) => void;
+}
+
+export default function CategoryChips({ active, onSelect }: CategoryChipsProps) {
   return (
-    <div className="flex flex-wrap gap-2" aria-label="Categorias">
-      {categories.map((category) => (
-        <button
-          key={category}
-          type="button"
-          onClick={() => onSelect(category)}
-          className={`rounded-full px-4 py-2 text-sm font-medium transition ${selected === category ? "bg-slate-900 text-white" : "bg-white text-slate-600 ring-1 ring-slate-200 hover:bg-slate-100"}`}
-          aria-pressed={selected === category}
-        >
-          {category}
-        </button>
-      ))}
-    </div>
+    <section className="w-full mb-5 -mx-space-lg px-space-lg overflow-x-auto no-scrollbar py-1">
+      <div className="flex items-center gap-2 min-w-max" role="tablist" aria-label="Categorias de produto">
+        {CATEGORIES.map((category) => {
+          const isActive = category.slug === active;
+          return (
+            <button
+              key={category.slug}
+              type="button"
+              role="tab"
+              aria-selected={isActive}
+              onClick={() => onSelect(category.slug)}
+              className={
+                isActive
+                  ? 'flex items-center gap-1.5 px-4 py-2 rounded-full bg-gradient-to-r from-primary to-primary-container text-on-primary font-label-lg text-label-lg shadow-[0_6px_16px_-2px_rgba(124,58,237,0.35)] transition-all active:scale-95'
+                  : 'flex items-center gap-1.5 px-4 py-2 rounded-full bg-surface-container-lowest text-secondary font-label-lg text-label-lg shadow-sm hover:text-on-surface transition-all active:scale-95'
+              }
+            >
+              <span className="material-symbols-outlined text-[18px]" aria-hidden="true">{category.icon}</span>
+              <span>{category.label}</span>
+            </button>
+          );
+        })}
+      </div>
+    </section>
   );
 }

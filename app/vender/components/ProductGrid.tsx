@@ -1,19 +1,29 @@
-import type { Product } from "@/lib/vender/types";
-import { ProductCard } from "./ProductCard";
+'use client';
 
-type ProductGridProps = {
+import { Product } from '@/lib/vender/types';
+import ProductCard from './ProductCard';
+
+interface ProductGridProps {
   products: Product[];
   onAdd: (product: Product) => void;
-};
+  justAddedId: string | null;
+}
 
-export function ProductGrid({ products, onAdd }: ProductGridProps) {
+export default function ProductGrid({ products, onAdd, justAddedId }: ProductGridProps) {
   if (products.length === 0) {
-    return <p className="rounded-2xl border border-dashed border-slate-300 p-8 text-center text-sm text-slate-500">Nenhum produto encontrado.</p>;
+    return (
+      <div className="flex flex-col items-center justify-center text-center py-16 gap-2">
+        <span className="material-symbols-outlined text-[40px] text-outline" aria-hidden="true">search_off</span>
+        <p className="font-body-md text-body-md text-secondary">Nenhum produto encontrado.</p>
+      </div>
+    );
   }
 
   return (
-    <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
-      {products.map((product) => <ProductCard key={product.id} product={product} onAdd={onAdd} />)}
+    <div className="grid grid-cols-2 gap-3.5 w-full">
+      {products.map((product) => (
+        <ProductCard key={product.id} product={product} onAdd={onAdd} justAdded={justAddedId === product.id} />
+      ))}
     </div>
   );
 }

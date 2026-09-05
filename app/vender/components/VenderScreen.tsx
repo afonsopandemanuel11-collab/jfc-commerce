@@ -1,52 +1,92 @@
-"use client";
+'use client';
 
-import { useMemo, useState } from "react";
-import { getProductCategories } from "@/lib/vender/categories";
-import { getAvailableQuantity } from "@/lib/vender/stock";
-import type { CartItem, Product } from "@/lib/vender/types";
-import { CartSheet } from "./CartSheet";
-import { CategoryChips } from "./CategoryChips";
-import { ProductGrid } from "./ProductGrid";
-import { SearchBar } from "./SearchBar";
-import { Toast } from "./Toast";
+import { useMemo, useState } from 'react';
+import { Product, CartItem } from '@/lib/vender/types';
+import { formatKz } from '@/lib/vender/format';
+import SearchBar from './SearchBar';
+import CategoryChips from './CategoryChips';
+import ProductGrid from './ProductGrid';
+import CartSheet from './CartSheet';
+import Toast from './Toast';
 
-type VenderScreenProps = { products: Product[] };
+// TEMPORÁRIO — SUBSTITUIR POR REGRA DE DESCONTO REAL (ex: tabela `discount_rules` no Supabase)
+const FLAT_DISCOUNT = 1000;
 
-export function VenderScreen({ products }: VenderScreenProps) {
-  const [search, setSearch] = useState("");
-  const [category, setCategory] = useState("Todos");
-  const [cart, setCart] = useState<CartItem[]>([]);
-  const [showCart, setShowCart] = useState(false);
-  const [toast, setToast] = useState<string | null>(null);
-  const categories = getProductCategories(products);
-  const filteredProducts = useMemo(() => products.filter((product) => (category === "Todos" || product.category === category) && product.name.toLowerCase().includes(search.toLowerCase())), [category, products, search]);
-  const cartCount = cart.reduce((sum, item) => sum + item.quantity, 0);
+interface VenderScreenProps {
+  initialProducts: Product[];
+}
 
-  function addToCart(product: Product) {
-    setCart((current) => {
-      const existing = current.find((item) => item.id === product.id);
-      if (existing) return current.map((item) => item.id === product.id ? { ...item, quantity: getAvailableQuantity(product, item.quantity + 1) } : item);
-      return [...current, { ...product, quantity: 1 }];
+export default function VenderScreen({ initialProducts }: VenderScreenProps) {
+  const [products] = useState(initialProducts);
+  const [activeCategory, setActiveCategory] = useState('todos');
+  const [searchQuery, setSearchQuery] = useState('');
+  const [cart, setCart] = useState<Record<string, CartItem>>({});
+  const [justAddedId, setJustAddedId] = useState<string | null>(null);
+  const [toastMessage, setToastMessage] = useState<string | null>(null);
+
+  const filteredProducts = useMemo(() => {
+    const query = searchQuery.trim().toLowerCase();
+    return products.filter((product) => {
+      const matchesCategory = activeCategory === 'todos' || product.categorySlug === activeCategory;
+      const matchesQuery = query.length === 0 || product.name.toLowerCase().includes(query);
+      return matchesCategory && matchesQuery;
     });
-    setToast(`${product.name} adicionado ao carrinho`);
+  }, [products, activeCategory, searchQuery]);
+
+  const { itemsCount, subtotal } = useMemo(() => {
+    const items = Object.values(cart);
+    return {
+      itemsCount: items.reduce((sum, item) => sum + item.quantity, 0),
+      subtotal: items.reduce((sum, item) => sum + item.quantity * item.price, 0),
+    };
+  }, [cart]);
+
+  const discount = itemsCount > 0 ? FLAT_DISCOUNT : 0;
+  const total = Math.max(0, subtotal - discount);
+
+  function handleAddToCart(product: Product) {
+    setCart((prev) => ({
+      ...prev,
+      [product.id]: {
+        productId: product.id,
+        name: product.name,
+        price: product.price,
+        quantity: (prev[product.id]?.quantity ?? 0) + 1,
+      },
+    }));
+
+    setJustAddedId(product.id);
+    setTimeout(() => setJustAddedId(null), 200);
+    setToastMessage(`+1 ${product.name} adicionado!`);
   }
 
-  function changeQuantity(id: string, quantity: number) {
-    setCart((current) => current.map((item) => item.id === id ? { ...item, quantity: Math.min(Math.max(quantity, 0), item.stock) } : item).filter((item) => item.quantity > 0));
+  function handleCheckout() {
+    // TEMPORÁRIO — SUBSTITUIR PELA NAVEGAÇÃO/INTEGRAÇÃO REAL DE PAGAMENTO
+    setToastMessage(`Iniciando pagamento de ${formatKz(total)}...`);
   }
 
   return (
-    <main className="min-h-screen bg-slate-50 px-6 py-10 text-slate-950">
-      <div className="mx-auto max-w-7xl">
-        <header className="flex flex-wrap items-end justify-between gap-5">
-          <div><p className="text-sm font-semibold uppercase tracking-[0.2em] text-emerald-600">Ponto de venda</p><h1 className="mt-2 text-3xl font-bold">Vender</h1></div>
-          <button type="button" onClick={() => setShowCart(true)} className="rounded-xl bg-slate-900 px-4 py-3 text-sm font-semibold text-white hover:bg-slate-700">Carrinho ({cartCount})</button>
-        </header>
-        <div className="mt-8 grid gap-4 md:grid-cols-[minmax(0,1fr)_auto] md:items-center"><SearchBar value={search} onChange={setSearch} /><CategoryChips categories={categories} selected={category} onSelect={setCategory} /></div>
-        <section className="mt-8"><ProductGrid products={filteredProducts} onAdd={addToCart} /></section>
-        {showCart && <div className="fixed inset-y-0 right-0 z-20 w-full max-w-md overflow-y-auto bg-slate-50 p-6 shadow-2xl"><CartSheet items={cart} onChangeQuantity={changeQuantity} onClose={() => setShowCart(false)} /></div>}
+    <div className="flex flex-col w-full pb-32">
+      <SearchBar value={searchQuery} onChange={setSearchQuery} />
+      <CategoryChips active={activeCategory} onSelect={setActiveCategory} />
+
+      <div className="flex items-center justify-between mb-3 px-0.5">
+        <div className="flex items-center gap-2">
+          <span className="font-title-sm text-title-sm text-on-surface">Catálogo de Venda</span>
+          <span className="font-label-sm text-label-sm px-2 py-0.5 rounded-full bg-secondary-container text-on-secondary-container">
+            {filteredProducts.length === 1 ? '1 item' : `${filteredProducts.length} itens`}
+          </span>
+        </div>
+        <button className="flex items-center gap-1 font-label-sm text-label-sm text-primary hover:underline" type="button">
+          <span className="material-symbols-outlined text-[16px]" aria-hidden="true">tune</span>
+          <span>Filtros</span>
+        </button>
       </div>
-      {toast && <Toast message={toast} onDismiss={() => setToast(null)} />}
-    </main>
+
+      <ProductGrid products={filteredProducts} onAdd={handleAddToCart} justAddedId={justAddedId} />
+
+      <CartSheet itemsCount={itemsCount} subtotal={subtotal} discount={discount} total={total} onCheckout={handleCheckout} />
+      <Toast message={toastMessage} onDismiss={() => setToastMessage(null)} />
+    </div>
   );
 }

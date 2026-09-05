@@ -1,11 +1,19 @@
-export type Product = {
+export type StockStatus = 'disponivel' | 'baixo' | 'critico';
+
+export interface Product {
   id: string;
   name: string;
-  category: string;
-  price: number;
+  categorySlug: string;
+  variantLabel: string; // ex: "Têxtil • Azul Marinho"
+  price: number; // Kz, inteiro
   stock: number;
-};
+  imageUrl: string;
+  imageAlt: string;
+}
 
-export type CartItem = Product & {
+export interface CartItem {
+  productId: string;
+  name: string;
+  price: number;
   quantity: number;
-};
+}

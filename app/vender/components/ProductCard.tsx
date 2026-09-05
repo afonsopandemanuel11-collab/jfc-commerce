@@ -1,34 +1,69 @@
-import { formatCurrency } from "@/lib/vender/format";
-import type { Product } from "@/lib/vender/types";
+'use client';
 
-type ProductCardProps = {
+import Image from 'next/image';
+import { Product } from '@/lib/vender/types';
+import { formatKz } from '@/lib/vender/format';
+import { getStockStatus, getStockLabel } from '@/lib/vender/stock';
+
+interface ProductCardProps {
   product: Product;
   onAdd: (product: Product) => void;
+  justAdded: boolean;
+}
+
+const STOCK_BADGE_CLASSES: Record<string, string> = {
+  disponivel: 'bg-emerald-50 text-emerald-700',
+  baixo: 'bg-amber-50 text-amber-700',
+  critico: 'bg-rose-50 text-rose-700',
 };
 
-export function ProductCard({ product, onAdd }: ProductCardProps) {
-  const unavailable = product.stock === 0;
+const STOCK_DOT_CLASSES: Record<string, string> = {
+  disponivel: 'bg-emerald-500',
+  baixo: 'bg-amber-500 animate-pulse',
+  critico: 'bg-rose-500 animate-ping',
+};
+
+export default function ProductCard({ product, onAdd, justAdded }: ProductCardProps) {
+  const status = getStockStatus(product.stock);
 
   return (
-    <article className="flex flex-col rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
-      <div className="flex items-start justify-between gap-3">
-        <div>
-          <p className="text-xs font-semibold uppercase tracking-wide text-slate-400">{product.category}</p>
-          <h2 className="mt-2 font-semibold text-slate-950">{product.name}</h2>
+    <div className="group relative flex flex-col bg-surface-container-lowest rounded-2xl p-2.5 shadow-[0_4px_20px_-2px_rgba(107,70,193,0.06),0_2px_6px_-1px_rgba(0,0,0,0.04)] active:scale-[0.98] transition-all">
+      <div className="relative w-full aspect-square rounded-xl overflow-hidden bg-surface-container-low mb-2.5">
+        <Image
+          src={product.imageUrl}
+          alt={product.imageAlt}
+          fill
+          sizes="(max-width: 480px) 45vw, 200px"
+          className="object-cover group-hover:scale-105 transition-transform duration-300"
+        />
+        <span className={`absolute top-2 left-2 px-2 py-0.5 rounded-full font-label-sm text-label-sm font-semibold flex items-center gap-1 shadow-sm ${STOCK_BADGE_CLASSES[status]}`}>
+          <span className={`w-1.5 h-1.5 rounded-full ${STOCK_DOT_CLASSES[status]}`} aria-hidden="true" />
+          {getStockLabel(product.stock)}
+        </span>
+      </div>
+      <div className="flex flex-col flex-1 justify-between gap-2">
+        <div className="flex flex-col min-w-0">
+          <h3 className="font-title-sm text-title-sm text-on-surface truncate leading-tight">{product.name}</h3>
+          <span className="font-body-sm text-body-sm text-secondary truncate">{product.variantLabel}</span>
         </div>
-        <span className="rounded-lg bg-slate-100 px-2 py-1 text-xs text-slate-500">{product.stock} un.</span>
+        <div className="flex items-center justify-between gap-1 mt-1">
+          <div className="flex flex-col">
+            <span className="font-label-sm text-[10px] text-secondary tracking-tight">PREÇO</span>
+            <span className="font-title-sm text-title-sm text-primary font-bold">{formatKz(product.price)}</span>
+          </div>
+          <button
+            aria-label={`Adicionar ${product.name} ao carrinho`}
+            type="button"
+            onClick={() => onAdd(product)}
+            disabled={product.stock === 0}
+            className={`w-9 h-9 rounded-full text-on-primary flex items-center justify-center shadow-[0_4px_12px_rgba(99,14,212,0.3)] active:scale-90 transition-all shrink-0 disabled:opacity-40 disabled:pointer-events-none ${
+              justAdded ? 'scale-125 bg-tertiary-container' : 'bg-primary hover:bg-primary-container'
+            }`}
+          >
+            <span className="material-symbols-outlined text-[20px]">add</span>
+          </button>
+        </div>
       </div>
-      <div className="mt-6 flex items-center justify-between gap-3">
-        <span className="text-lg font-bold text-slate-950">{formatCurrency(product.price)}</span>
-        <button
-          type="button"
-          disabled={unavailable}
-          onClick={() => onAdd(product)}
-          className="rounded-lg bg-emerald-600 px-3 py-2 text-sm font-semibold text-white transition hover:bg-emerald-700 disabled:cursor-not-allowed disabled:bg-slate-200 disabled:text-slate-400"
-        >
-          {unavailable ? "Sem estoque" : "Adicionar"}
-        </button>
-      </div>
-    </article>
+    </div>
   );
 }
